@@ -319,7 +319,8 @@ class Frbcat():
         if repeat_bursts is False:
             # Only keeps one detection of repeaters
             self.df = self.df.sort_values('utc')
-            self.df = self.df.drop_duplicates(subset=['frb_name'], keep='first')
+            self.df = self.df.drop_duplicates(subset=['frb_name'],
+                                              keep='first')
 
         self.df = self.df.sort_index()
 

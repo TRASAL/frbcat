@@ -8,4 +8,5 @@ setup(name='frbcat',
       author_email='davidgardenier@gmail.com',
       license='MIT',
       packages=['frbcat'],
+      install_requires=['pandas', 'requests', 'numpy'],
       zip_safe=False)

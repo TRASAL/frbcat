@@ -1,0 +1,1 @@
+from .frbcat import Frbcat

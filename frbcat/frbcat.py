@@ -8,7 +8,7 @@ import requests
 import numpy as np
 import webbrowser
 
-from .misc import pprint, frac_deg, radec_to_lb
+import frbcat.misc as misc
 
 
 class Frbcat():
@@ -142,23 +142,24 @@ class Frbcat():
         if update:
             try:
                 if not self.mute:
-                    pprint('Attempting to retrieve FRBCAT from www.frbcat.org')
+                    m = 'Attempting to retrieve FRBCAT from www.frbcat.org'
+                    misc.pprint(m)
 
                 # First get all FRB names from the main page
                 if not self.mute:
-                    pprint(' - Getting FRB names')
+                    misc.pprint(' - Getting FRB names')
                 url = 'http://frbcat.org/products/'
                 main_df = self.url_to_df(url)
 
                 # Then get any subsequent analyses (multiple entries per FRB)
                 if not self.mute:
-                    pprint(' - Getting subsequent analyses')
+                    misc.pprint(' - Getting subsequent analyses')
                 url = 'http://frbcat.org/product/'
                 frb_df = self.urls_to_df(main_df.frb_name, url)
 
                 # Find all frb note properties
                 if not self.mute:
-                    pprint(' - Getting notes on FRBs')
+                    misc.pprint(' - Getting notes on FRBs')
                 url = 'http://frbcat.org/frbnotes/'
                 frbnotes_df = self.urls_to_df(set(frb_df.index), url)
                 if frbnotes_df is not None:
@@ -166,7 +167,7 @@ class Frbcat():
 
                 # Find all notes on radio observation parameters
                 if not self.mute:
-                    pprint(' - Getting radio observation parameters')
+                    misc.pprint(' - Getting radio observation parameters')
                 url = 'http://frbcat.org/ropnotes/'
                 ropnotes_df = self.urls_to_df(set(frb_df.index), url)
                 if ropnotes_df is not None:
@@ -174,7 +175,7 @@ class Frbcat():
 
                 # Find all radio measurement parameters
                 if not self.mute:
-                    pprint(' - Getting radio measurement parameters')
+                    misc.pprint(' - Getting radio measurement parameters')
                 url = 'http://frbcat.org/rmppubs/'
                 rmppubs_df = self.urls_to_df(set(frb_df.index), url)
                 rmppubs_df = rmppubs_df.add_prefix('rmp_pub_')
@@ -206,7 +207,7 @@ class Frbcat():
                                    how='left')
 
                 if not self.mute:
-                    pprint('Succeeded')
+                    misc.pprint('Succeeded')
 
                 if save:
                     date = str(datetime.datetime.today()).split()[0]
@@ -224,7 +225,7 @@ class Frbcat():
             f = max(glob.glob(self.path + '/frbcat*.csv'),
                     key=os.path.getctime)
             if not self.mute:
-                pprint(f"Using {f.split('/')[-1]}")
+                misc.pprint(f"Using {f.split('/')[-1]}")
             self.df = pd.read_csv(f)
 
     def clean(self):
@@ -329,8 +330,8 @@ class Frbcat():
             if df['raj'].count(':') < 2:
                 df['raj'] = df['raj'] + ':00'
 
-            ra, dec = frac_deg(df['raj'], df['decj'])
-            gl, gb = radec_to_lb(ra, dec, frac=True)
+            ra, dec = misc.frac_deg(df['raj'], df['decj'])
+            gl, gb = misc.radec_to_lb(ra, dec, frac=True)
             df['ra'] = ra
             df['dec'] = dec
             df['gl'] = gl

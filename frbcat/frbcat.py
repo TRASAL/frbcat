@@ -6,6 +6,7 @@ import os
 import pandas as pd
 import requests
 import numpy as np
+import webbrowser
 
 from .misc import pprint, frac_deg, radec_to_lb
 
@@ -19,26 +20,24 @@ class Frbcat():
                  repeat_bursts=True,
                  update='monthly',
                  path=None,
-                 one_per_frb=True):
+                 one_entry_per_frb=True,
+                 mute=False):
         """Query FRBCAT.
 
         Args:
-            oneoffs (type): Whether to include oneoffs. Defaults to True.
-            repeaters (type): Whether to include repeaters. Defaults to True.
-            repeat_bursts (type): Whether to include multiple bursts per
+            oneoffs (bool): Whether to include oneoffs. Defaults to True.
+            repeaters (bool): Whether to include repeaters. Defaults to True.
+            repeat_bursts (bool): Whether to include multiple bursts per
                 repeater. Defaults to True.
             update (str): Always get a new version (True), get a new version
                 once a month ('monthly'), or never get a new version (False).
                 Defaults to 'monthly'.
-            path (type): Directory in which to save the csv file. Defaults to
+            path (str): Directory in which to save the csv file. Defaults to
                 your Downloads folder.
-            one_per_frb (type): Frbcat can have multiple determined values per
-                burst (using different methods etc). Stick to the default of
-                True unless you feel brave.
-
-        Returns:
-            type: Description of returned object.
-
+            one_entry_per_frb (bool): Frbcat can have multiple determined
+                values per burst (using different methods etc). Stick to the
+                default of True unless you feel brave.
+            mute (bool): Whether to mute output in the terminal
         """
         if path is None:
             path = os.path.expanduser('~') + '/Downloads/'
@@ -48,22 +47,28 @@ class Frbcat():
         self.repeaters = repeaters
         self.repeat_bursts = repeat_bursts
         self.oneoffs = oneoffs
+        self.mute = mute
 
         # Get frbcat data
         self.get(update=update)
 
+        # Clean the frb data
         self.clean()
+
+        # Add some coordinate transformations
         self.coor_trans()
 
-        self.filter(one_per_frb=one_per_frb,
+        # Filter the data
+        self.filter(one_entry_per_frb=one_entry_per_frb,
                     repeat_bursts=repeat_bursts,
                     repeaters=repeaters,
                     one_offs=oneoffs)
 
-        # Just to neaten up
+        # Neaten up the data
         self.df = self.df.sort_values('utc', ascending=False)
         self.df = self.df.reindex(sorted(self.df.columns), axis=1)
 
+        # Add a keywords for people used to Astropy DataFrames
         self.pandas = self.df
 
     def url_to_df(self, url):
@@ -136,34 +141,40 @@ class Frbcat():
 
         if update:
             try:
-                pprint('Attempting to retrieve FRBCAT from www.frbcat.org')
+                if not self.mute:
+                    pprint('Attempting to retrieve FRBCAT from www.frbcat.org')
 
                 # First get all FRB names from the main page
-                pprint(' - Getting FRB names')
+                if not self.mute:
+                    pprint(' - Getting FRB names')
                 url = 'http://frbcat.org/products/'
                 main_df = self.url_to_df(url)
 
                 # Then get any subsequent analyses (multiple entries per FRB)
-                pprint(' - Getting subsequent analyses')
+                if not self.mute:
+                    pprint(' - Getting subsequent analyses')
                 url = 'http://frbcat.org/product/'
                 frb_df = self.urls_to_df(main_df.frb_name, url)
 
                 # Find all frb note properties
-                pprint(' - Getting notes on FRBs')
+                if not self.mute:
+                    pprint(' - Getting notes on FRBs')
                 url = 'http://frbcat.org/frbnotes/'
                 frbnotes_df = self.urls_to_df(set(frb_df.index), url)
                 if frbnotes_df is not None:
                     frbnotes_df = frbnotes_df.add_prefix('frb_notes_')
 
                 # Find all notes on radio observation parameters
-                pprint(' - Getting radio observation parameters')
+                if not self.mute:
+                    pprint(' - Getting radio observation parameters')
                 url = 'http://frbcat.org/ropnotes/'
                 ropnotes_df = self.urls_to_df(set(frb_df.index), url)
                 if ropnotes_df is not None:
                     ropnotes_df = ropnotes_df.add_prefix('rop_notes_')
 
                 # Find all radio measurement parameters
-                pprint(' - Getting radio measurement parameters')
+                if not self.mute:
+                    pprint(' - Getting radio measurement parameters')
                 url = 'http://frbcat.org/rmppubs/'
                 rmppubs_df = self.urls_to_df(set(frb_df.index), url)
                 rmppubs_df = rmppubs_df.add_prefix('rmp_pub_')
@@ -194,7 +205,8 @@ class Frbcat():
                                    right_on='rmp_pub_rmp_id',
                                    how='left')
 
-                pprint('Succeeded')
+                if not self.mute:
+                    pprint('Succeeded')
 
                 if save:
                     date = str(datetime.datetime.today()).split()[0]
@@ -211,7 +223,8 @@ class Frbcat():
             # Find latest version of frbcat
             f = max(glob.glob(self.path + '/frbcat*.csv'),
                     key=os.path.getctime)
-            pprint(f"Using {f.split('/')[-1]}")
+            if not self.mute:
+                pprint(f"Using {f.split('/')[-1]}")
             self.df = pd.read_csv(f)
 
     def clean(self):
@@ -234,7 +247,8 @@ class Frbcat():
         for c in self.df.columns:
             if self.df[c].dtype == object:
                 if any(self.df[c].str.contains('&plusmn', na=False)):
-                    val, err = self.df[c].str.split('&plusmn', 1).str
+                    cols = self.df[c].str.partition('&plusmn')[[0, 2]]
+                    val, err = cols[0], cols[2]
                     self.df[c] = pd.to_numeric(val)
                     self.df[c+'_err'] = pd.to_numeric(err)
 
@@ -243,37 +257,18 @@ class Frbcat():
             if self.df[c].dtype == object:
                 if any(self.df[c].str.contains('<sup>', na=False)):
                     upper = "<span className='supsub'><sup>"
-                    val, rest = self.df[c].str.split(upper, 1).str
-                    upper, rest = rest.str.split('</sup><sub>', 1).str
-                    lower, _ = rest.str.split('</sub></span>', 1).str
+                    cols = self.df[c].str.partition(upper)[[0, 2]]
+                    val, rest = cols[0], cols[2]
+                    cols = rest.str.partition('</sup><sub>')[[0, 2]]
+                    upper, rest = cols[0], cols[2]
+                    cols = rest.str.partition('</sub></span>')[[0, 2]]
+                    lower, rest = cols[0], cols[2]
                     self.df[c] = pd.to_numeric(val)
                     self.df[c+'_err_up'] = pd.to_numeric(upper)
                     self.df[c+'_err_down'] = pd.to_numeric(lower)
 
-        # Conversion table
-        convert = {'mw_dm_limit': 'dm_mw',
-                   'width': 'w_eff',
-                   'flux': 's_peak',
-                   'redshift_host': 'z',
-                   'spectral_index': 'si',
-                   'dispersion_smearing': 't_dm',
-                   'dm_error': 'dm_err',
-                   'scattering_timescale': 't_scat',
-                   'sampling_time': 't_samp'}
-
-        self.df.rename(columns=convert, inplace=True)
-
         # Ensure columns are the right datatype
-        self.df.w_eff = pd.to_numeric(self.df.w_eff, errors='coerce')
-
-        # Add some extra columns
-        self.df['fluence'] = self.df['s_peak'] * self.df['w_eff']
-
-        # Gives somewhat of an idea of the pulse width upon arrival at Earth
-        self.df['w_arr'] = (self.df['w_eff']**2 -
-                            self.df['t_dm']**2 -
-                            self.df['t_scat']**2 -
-                            self.df['t_samp']**2)**0.5
+        self.df.width = pd.to_numeric(self.df.width, errors='coerce')
 
         # Reduce confusion in telescope names
         small_tele = self.df['telescope'].str.lower()
@@ -284,8 +279,8 @@ class Frbcat():
 
         # Replace chime/frb with chime
         if any(self.df['telescope'].str.contains('chime/frb', na=False)):
-            val, _ = self.df['telescope'].str.split('/', 1).str
-            self.df['telescope'] = val
+            cols = self.df['telescope'].str.partition('/')
+            self.df['telescope'] = cols[0]
 
         # Remove any enters in titles
         self.df.pub_description = self.df.pub_description.str.replace('\n', '')
@@ -299,9 +294,9 @@ class Frbcat():
                one_offs=True,
                repeaters=True,
                repeat_bursts=False,
-               one_per_frb=True):
+               one_entry_per_frb=True):
         """Filter frbcat in various ways."""
-        if one_per_frb is True:
+        if one_entry_per_frb is True:
             # Only keep rows with the largest number of parameters
             # so that only one row per detected FRB remains
             self.df['count'] = self.df.count(axis=1)
@@ -344,6 +339,12 @@ class Frbcat():
 
         self.df = self.df.apply(trans, axis=1)
 
+    def parameters(self):
+        """Show the paper in which the parameters are defined."""
+        webbrowser.open_new_tab('https://arxiv.org/pdf/1601.03547.pdf')
+
 
 if __name__ == '__main__':
+    import IPython
     f = Frbcat()
+    IPython.embed()

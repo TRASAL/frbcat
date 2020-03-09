@@ -111,7 +111,7 @@ class Frbcat():
         """
         dfs = []
         for ending in endings:
-            full_url = f'{url}{ending}'
+            full_url = str(url) + str(ending)
             df = self.url_to_df(full_url)
             if isinstance(df, pd.DataFrame):
                 dfs.append(df)
@@ -211,7 +211,7 @@ class Frbcat():
 
                 if save:
                     date = str(datetime.datetime.today()).split()[0]
-                    path = f'{self.path}/frbcat_{date}.csv'
+                    path = str(self.path) + '/frbcat_' + str(date) + '.csv'
                     self.df.to_csv(path)
 
                 update = False

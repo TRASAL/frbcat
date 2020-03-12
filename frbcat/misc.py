@@ -13,7 +13,8 @@ def pprint(*s, output=True):
     else:
         lines = []
         for e in s:
-            lines.append('\n'.join([f'{m} {f}' for f in e.split('\n')]))
+            line = [str(m) + ' ' + str(f) for f in e.split('\n')]
+            lines.append('\n'.join(line))
         return '\n'.join(lines)
 
 

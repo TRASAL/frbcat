@@ -14,7 +14,6 @@ from frbcat import Frbcat
 df = Frbcat().df
 ```
 Or get the chime repeaters using
-Get a Pandas DataFrame using
 ```python
 from frbcat import ChimeRepeaters
 df = ChimeRepeaters().df

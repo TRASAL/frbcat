@@ -8,11 +8,23 @@ pip3 install frbcat
 ```
 
 ## Usage
-Get a Pandas DataFrame using
+Get a Pandas DataFrame of `frbcat` using
 ```python
 from frbcat import Frbcat
 df = Frbcat().df
 ```
+Or get the chime repeaters using
+Get a Pandas DataFrame using
+```python
+from frbcat import ChimeRepeaters
+df = ChimeRepeaters().df
+```
+
+## Requirements
+
+* pandas
+* numpy
+* requests
 
 ## Contributing
 

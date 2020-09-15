@@ -2,7 +2,7 @@
 from setuptools import setup
 
 setup(name='frbcat',
-      version='0.2.1',
+      version='0.2.2',
       description='Query the FRB catalogue',
       url='http://github.com/davidgardenier/frbcat',
       author='David Gardenier',

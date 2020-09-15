@@ -136,8 +136,8 @@ class TNS(object):
         while more:
             # Limit results to frbs
             url = 'https://wis-tns.weizmann.ac.il/search?&include_frb=1'
-            url += '&objtype%5B%5D=130&num_page=' + page_length + '&page='
-            url += page
+            url += '&objtype%5B%5D=130&num_page=' + str(page_length) + '&page='
+            url += str(page)
 
             with urllib.request.urlopen(url) as resp:
                 data = resp.read().decode().split('\n')

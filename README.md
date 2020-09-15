@@ -18,6 +18,13 @@ Or get the chime repeaters using
 from frbcat import ChimeRepeaters
 df = ChimeRepeaters().df
 ```
+Or get the FRBs from the Transient Name Server, which as of Sep 2020 should have all FRBs
+```python
+from frbcat import TNS
+tns = TNS()
+df = tns.df
+units = tns.units
+```
 
 ## Requirements
 

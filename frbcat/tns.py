@@ -132,6 +132,10 @@ class TNS(object):
         page = 0
         page_length = 500
 
+        if not self.mute:
+            m = 'Attempting to retrieve FRBs from the transient name server'
+            misc.pprint(m)
+
         # Loop through pages on TNS webpage till no more results
         while more:
             # Limit results to frbs

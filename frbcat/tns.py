@@ -136,7 +136,8 @@ class TNS(object):
         while more:
             # Limit results to frbs
             url = 'https://wis-tns.weizmann.ac.il/search?&include_frb=1'
-            url += f'&objtype%5B%5D=130&num_page={page_length}&page={page}'
+            url += '&objtype%5B%5D=130&num_page=' + page_length + '&page='
+            url += page
 
             with urllib.request.urlopen(url) as resp:
                 data = resp.read().decode().split('\n')
@@ -184,7 +185,7 @@ class TNS(object):
                     for other_par in frb[par][0]:
                         name = other_par
                         if other_par in frb:
-                            name = f"{par.split('_')[0]}_{other_par}"
+                            name = par.split('_')[0] + '_' + other_par
                         row[name] = frb[par][0][other_par]
                 else:
                     row[par] = frb[par]
@@ -277,7 +278,7 @@ class TNS(object):
             cols = df[c].str.partition(' (')[[0, 2]]
             value, err = cols[0], cols[2]
             df[c.split('_')[-1]] = value
-            df[f"{c.split('_')[-1]}_err"] = err.str.strip(')')
+            df[c.split('_')[-1] + '_err'] = err.str.strip(')')
             df = df.drop([c], axis=1, errors='ignore')
 
         cols = df.flux.str.partition(' (')[[0, 2]]

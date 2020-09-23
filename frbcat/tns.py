@@ -134,7 +134,11 @@ class TNS(object):
             f = max(glob.glob(self.path + '/tns*.csv'), key=os.path.getctime)
             if not self.mute:
                 misc.pprint("Using " + f.split('/')[-1])
-            self.df = pd.read_csv(f)
+
+            date_cols = ['time_received', 'barycentric_event_time',
+                         'discovery_date', 'photometry_date',
+                         'lastmodified']
+            self.df = pd.read_csv(f, parse_dates=date_cols)
 
     def row2json(self, line):
         """Convert row of html table to json format."""

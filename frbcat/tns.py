@@ -1,8 +1,10 @@
 """Script to download FRB information from the TNS servers."""
-import os
-import urllib.request
-import pandas as pd
+import datetime
+import glob
 import numpy as np
+import os
+import pandas as pd
+import urllib.request
 
 import frbcat.misc as misc
 
@@ -16,6 +18,7 @@ class TNS(object):
                  repeat_bursts=True,
                  update='monthly',
                  path=None,
+                 save=True,
                  mute=False):
         """Query FRBCAT.
         Args:
@@ -28,17 +31,18 @@ class TNS(object):
              Defaults to 'monthly'.
          path (str): Directory in which to save the csv file. Defaults to
              your Downloads folder.
+         save (bool): Whether to save the resulting csv file to path.
          mute (bool): Whether to mute output in the terminal
-         """
-
+        """
+        self.path = path
         if path is None:
-            path = os.path.expanduser('~') + '/Downloads/'
+            self.path = os.path.expanduser('~') + '/Downloads/'
 
         self.oneoffs = oneoffs
         self.repeaters = repeaters
         self.repeat_bursts = repeat_bursts
         self.update = update
-        self.path = path
+        self.save = save
         self.mute = mute
 
         self.get_data()
@@ -101,9 +105,36 @@ class TNS(object):
                       }
 
     def get_data(self):
-        entries = self.get_json()
-        df = self.json2df(entries)
-        self.clean_df(df)
+        # Check whether a copy of FRBCAT has already been downloaded
+        # Ensures TNS is only queried once a month
+        path = self.path + '/tns_'
+        path += str(datetime.datetime.today()).split()[0][:-3]
+        path += '-??.csv'
+        exists = glob.glob(path)
+        if self.update == 'monthly' and exists:
+            self.update = False
+
+        if self.update:
+            try:
+                entries = self.get_json()
+                df = self.json2df(entries)
+                self.clean_df(df)
+
+                if self.save:
+                    date = str(datetime.datetime.today()).split()[0]
+                    path = str(self.path) + '/tns_' + str(date) + '.csv'
+                    self.df.to_csv(path)
+
+            # Unless there's no internet
+            except urllib.URLError:
+                self.update = False
+
+        if self.update is False:
+            # Find latest version of frbcat
+            f = max(glob.glob(self.path + '/tns*.csv'), key=os.path.getctime)
+            if not self.mute:
+                misc.pprint("Using " + f.split('/')[-1])
+            self.df = pd.read_csv(f)
 
     def row2json(self, line):
         """Convert row of html table to json format."""
@@ -133,7 +164,7 @@ class TNS(object):
         page_length = 500
 
         if not self.mute:
-            m = 'Attempting to retrieve FRBs from the transient name server'
+            m = 'Attempting to retrieve FRBs from the Transient Name Server'
             misc.pprint(m)
 
         # Loop through pages on TNS webpage till no more results
@@ -145,6 +176,9 @@ class TNS(object):
 
             with urllib.request.urlopen(url) as resp:
                 data = resp.read().decode().split('\n')
+
+            if not self.mute:
+                misc.pprint('Succeeded')
 
             # Go through HTML table
             for line in data:
@@ -377,5 +411,4 @@ class TNS(object):
 
 
 if __name__ == '__main__':
-    tns = TNS()
-    tns.get_data()
+    tns = TNS(update=True).df

@@ -123,7 +123,7 @@ class TNS(object):
                 if self.save:
                     date = str(datetime.datetime.today()).split()[0]
                     path = str(self.path) + '/tns_' + str(date) + '.csv'
-                    self.df.to_csv(path)
+                    self.df.to_csv(path, index=False)
 
             # Unless there's no internet
             except urllib.URLError:
@@ -411,4 +411,5 @@ class TNS(object):
 
 
 if __name__ == '__main__':
-    tns = TNS(update=True).df
+    tns = TNS().df
+    import IPython; IPython.embed()

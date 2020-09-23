@@ -6,7 +6,7 @@ import os
 import pandas as pd
 import urllib.request
 
-import frbcat.misc as misc
+import misc as misc
 
 
 class TNS(object):
@@ -387,9 +387,11 @@ class TNS(object):
 
         if repeat_bursts is False:
             # Only keeps one detection of repeaters
-            self.df = self.df.sort_values('discovery_date')
-            self.df = self.df.drop_duplicates(subset=['repeater_of_objid'],
-                                              keep='first')
+            self.df = self.df.sort_values('discovery_date',
+                                          ascending=True)
+            dup = (~self.df.duplicated(subset=['repeater_of_objid'],
+                                       keep='first'))
+            self.df = self.df[dup | (self.df['repeater_of_objid'].isnull())]
 
         self.df = self.df.sort_index()
 

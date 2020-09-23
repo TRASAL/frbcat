@@ -20,7 +20,7 @@ class TNS(object):
                  path=None,
                  save=True,
                  mute=False):
-        """Query FRBCAT.
+        """Query TNS.
         Args:
          oneoffs (bool): Whether to include oneoffs. Defaults to True.
          repeaters (bool): Whether to include repeaters. Defaults to True.

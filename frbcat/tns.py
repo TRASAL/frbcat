@@ -6,7 +6,7 @@ import os
 import pandas as pd
 import urllib.request
 
-import frbcat.misc as misc
+import misc as misc
 
 
 class TNS(object):
@@ -299,7 +299,7 @@ class TNS(object):
                         'frac_lin_pol': float})
 
         # Clean up columns
-        df.repeater_of_objid = df.repeater_of_objid.replace(r'^\s*$', '',
+        df.repeater_of_objid = df.repeater_of_objid.replace(r'^\s*$', pd.NaN,
                                                             regex=True)
 
         # Split columns
@@ -379,11 +379,11 @@ class TNS(object):
         """Filter frbcat in various ways."""
         if one_offs is False:
             # Only keep repeaters
-            self.df = self.df[self.df.repeater_of_objid != '']
+            self.df = self.df[~self.df.repeater_of_objid.isnull()]
 
         if repeaters is False:
             # Drops any repeater sources
-            self.df = self.df[self.df.repeater_of_objid == '']
+            self.df = self.df[self.df.repeater_of_objid.isnull()]
 
         if repeat_bursts is False:
             # Only keeps one detection of repeaters
@@ -418,3 +418,4 @@ class TNS(object):
 
 if __name__ == '__main__':
     tns = TNS().df
+    import IPython; IPython.embed()

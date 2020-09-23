@@ -6,7 +6,7 @@ import os
 import pandas as pd
 import urllib.request
 
-import misc as misc
+import frbcat.misc as misc
 
 
 class TNS(object):

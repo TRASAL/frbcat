@@ -387,7 +387,7 @@ class TNS(object):
 
         if repeat_bursts is False:
             # Only keeps one detection of repeaters
-            self.df = self.df.sort_values('discovery_date',
+            self.df = self.df.sort_values('photometry_date',
                                           ascending=True)
             dup = (~self.df.duplicated(subset=['repeater_of_objid'],
                                        keep='first'))
@@ -418,4 +418,3 @@ class TNS(object):
 
 if __name__ == '__main__':
     tns = TNS().df
-    import IPython; IPython.embed()

@@ -299,7 +299,7 @@ class TNS():
                         'frac_lin_pol': float})
 
         # Clean up columns
-        df.repeater_of_objid = df.repeater_of_objid.replace(r'^\s*$', None,
+        df.repeater_of_objid = df.repeater_of_objid.replace(r'^\s*$', np.nan,
                                                             regex=True)
 
         # Split columns

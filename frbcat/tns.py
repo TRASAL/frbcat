@@ -9,7 +9,7 @@ import urllib.request
 import frbcat.misc as misc
 
 
-class TNS(object):
+class TNS():
     """docstring for TNS."""
 
     def __init__(self,

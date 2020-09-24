@@ -126,7 +126,7 @@ class TNS():
                     self.df.to_csv(path, index=False)
 
             # Unless there's no internet
-            except urllib.URLError:
+            except urllib.error.URLError:
                 self.update = False
 
         if self.update is False:
@@ -299,7 +299,7 @@ class TNS():
                         'frac_lin_pol': float})
 
         # Clean up columns
-        df.repeater_of_objid = df.repeater_of_objid.replace(r'^\s*$', pd.NaN,
+        df.repeater_of_objid = df.repeater_of_objid.replace(r'^\s*$', None,
                                                             regex=True)
 
         # Split columns

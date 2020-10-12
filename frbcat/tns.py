@@ -347,7 +347,13 @@ class TNS():
             err[err == ''] = np.nan
             df[c + '_err'] = err.astype(float)
 
-        for c in ('ref_freq', 'inst_bandwidth', 'burst_bandwidth'):
+        cols = df.burst_bandwidth.str.strip(' MHz').str.partition(' (')[[0, 2]]
+        df['burst_bandwidth'] = cols[0].astype(float)
+        err = cols[2].str.strip(')')
+        err[err == ''] = np.nan
+        df['burst_bandwidth_err'] = err.astype(float)
+
+        for c in ('ref_freq', 'inst_bandwidth'):
             df[c] = df[c].str.strip(' MHz').astype(float)
 
         s = 'sampling_time'

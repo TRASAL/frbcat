@@ -174,7 +174,7 @@ class TNS():
         # Loop through pages on TNS webpage till no more results
         while more:
             # Limit results to frbs
-            url = 'https://wis-tns.weizmann.ac.il/search?&include_frb=1'
+            url = 'https://www.wis-tns.org/search?&include_frb=1'
             url += '&objtype%5B%5D=130&num_page=' + str(page_length) + '&page='
             url += str(page)
 

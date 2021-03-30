@@ -353,6 +353,8 @@ class TNS():
         err[err == ''] = np.nan
         df['burst_bandwidth_err'] = err.astype(float)
 
+        # Commenting out as some FAST entries seem to use GHz
+        # instead of MHz units in the reference frequency field
         #for c in ('ref_freq', 'inst_bandwidth'):
         #    df[c] = df[c].str.strip(' MHz').astype(float)
 

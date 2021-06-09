@@ -19,7 +19,9 @@ class TNS():
                  update='monthly',
                  path=None,
                  save=True,
-                 mute=False):
+                 mute=False,
+                 tns_id=None,
+                 tns_name=None):
         """Query TNS.
         Args:
          oneoffs (bool): Whether to include oneoffs. Defaults to True.
@@ -32,7 +34,9 @@ class TNS():
          path (str): Directory in which to save the csv file. Defaults to
              your Downloads folder.
          save (bool): Whether to save the resulting csv file to path.
-         mute (bool): Whether to mute output in the terminal
+         mute (bool): Whether to mute output in the terminal.
+         tns_id (int): TNS user id, required when getting a new version.
+         tns_name (str): TNS user name, required when getting a new version.
         """
         self.path = path
         if path is None:
@@ -44,6 +48,8 @@ class TNS():
         self.update = update
         self.save = save
         self.mute = mute
+        self.tns_id = tns_id
+        self.tns_name = tns_name
 
         self.get_data()
         self.filter(one_offs=self.oneoffs,
@@ -171,6 +177,13 @@ class TNS():
             m = 'Attempting to retrieve FRBs from the Transient Name Server'
             misc.pprint(m)
 
+        # Provide user agent to be able to access the webpage
+        if self.tns_id is None or self.tns_name is None:
+            raise ValueError('Provide tns_id and tns_name arguments '
+                             'when updating TNS data')
+        header = {'User-Agent': str({'tns_id': self.tns_id,
+                  'type': 'bot', 'name': self.tns_name})}
+
         # Loop through pages on TNS webpage till no more results
         while more:
             # Limit results to frbs
@@ -178,7 +191,8 @@ class TNS():
             url += '&objtype%5B%5D=130&num_page=' + str(page_length) + '&page='
             url += str(page)
 
-            with urllib.request.urlopen(url) as resp:
+            request = urllib.request.Request(url, headers=header)
+            with urllib.request.urlopen(request) as resp:
                 data = resp.read().decode().split('\n')
 
             if not self.mute:

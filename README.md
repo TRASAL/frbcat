@@ -21,7 +21,7 @@ df = ChimeRepeaters().df
 Or get the FRBs from the Transient Name Server, which as of Sep 2020 should have all FRBs
 ```python
 from frbcat import TNS
-tns = TNS()
+tns = TNS(tns_name='my_user_name', tns_id='my_user_id')
 df = tns.df
 units = tns.units
 ```

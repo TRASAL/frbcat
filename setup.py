@@ -1,8 +1,15 @@
 """Installation setup of the frbcat python package."""
+import os
 from setuptools import setup
 
+with open(os.path.join('frbcat', '__version__.py')) as f:
+    version = {}
+    exec(f.read(), version)
+    project_version = version['__version__']
+
+
 setup(name='frbcat',
-      version='0.2.16',
+      version=project_version,
       description='Query the FRB catalogue',
       url='http://github.com/davidgardenier/frbcat',
       author='David Gardenier',

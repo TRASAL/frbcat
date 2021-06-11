@@ -8,6 +8,8 @@ on:
 jobs:
   release-on-push:
     runs-on: ubuntu-latest
+    outputs:
+      version: ${{ steps.release.outputs.version }}
     env:
       GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
     steps:
@@ -29,11 +31,9 @@ jobs:
           python-version: 3.8
           architecture: x64
       - name: Build
-        env:
-          VERSION: ${{ needs.release-on-push.release.outputs.version }}
         run: |
           pip install wheel
-          echo "__version__ = '$VERSION'" > frbcat/__version__.py
+          echo "__version__ = '${{needs.release-on-push.outputs.version}}'" > frbcat/__version__.py
           python setup.py sdist bdist_wheel
       - name: Deploy
         uses: pypa/gh-action-pypi-publish@v1.4.2

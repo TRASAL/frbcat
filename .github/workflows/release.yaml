@@ -1,0 +1,42 @@
+name: Release
+
+on:
+  push:
+    branches:
+      - master
+
+jobs:
+  release-on-push:
+    runs-on: ubuntu-latest
+    env:
+      GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+    steps:
+      - id: release
+        uses: rymndhng/release-on-push-action@v0.20.0
+        with:
+          bump_version_scheme: patch
+
+  pypi-deploy:
+    runs-on: ubuntu-latest
+    # run only on successful release
+    needs: release-on-push
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v2.3.4
+      - name: Set up python
+        uses: actions/setup-python@v2.2.2
+        with:
+          python-version: 3.8
+          architecture: x64
+      - name: Build
+        env:
+          VERSION: ${{ needs.release-on-push.release.outputs.version }}
+        run: |
+          pip install wheel
+          echo "__version__ = '$VERSION'" >> frbcat/__version__.py
+          python setup.py sdist bdist_wheel
+      - name: Deploy
+        uses: pypa/gh-action-pypi-publish@v1.4.2
+        with:
+          user: __token__
+          password: ${{ secrets.PYPI_TOKEN }}

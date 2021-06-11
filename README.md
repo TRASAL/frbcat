@@ -1,5 +1,5 @@
 # Query the Fast Radio Burst Catalogue in Python
-<a href="https://ascl.net/2011.011"><img src="https://img.shields.io/badge/ascl-2011.011-blue.svg?colorB=262255" alt="ascl:2011.011" /></a> | David Gardenier | ASTRON
+<a href="https://ascl.net/2011.011"><img src="https://img.shields.io/badge/ascl-2011.011-blue.svg?colorB=262255" alt="ascl:2011.011" /></a>
 
 ## Installation
 
@@ -46,9 +46,3 @@ Contributions are what make the open source community such an amazing place to b
 ## License
 
 Distributed under the MIT License. See `LICENSE` for more information.
-
-
-## Contact
-Author: David Gardenier - gardenier@astron.nl
-
-Project Link: [https://github.com/davidgardenier/frbcat](https://github.com/davidgardenier/frbcat)

@@ -182,7 +182,7 @@ class TNS():
             raise ValueError('Provide tns_id and tns_name arguments '
                              'when updating TNS data')
         header = {'User-Agent': str({'tns_id': self.tns_id,
-                  'type': 'bot', 'name': self.tns_name})}
+                  'type': 'user', 'name': self.tns_name})}
 
         # Loop through pages on TNS webpage till no more results
         while more:

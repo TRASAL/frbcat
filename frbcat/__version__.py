@@ -1,1 +1,1 @@
-version = 'github'
+__version__ = 'github'

@@ -301,6 +301,9 @@ class TNS():
                            'related_files': 'num_files',
                            'channels_no': 'num_channels'}, inplace=True)
 
+        # Some columns that will be converted to int can contain NaN, replace these by -1
+        df.fillna({'reports_id': -1, 'photometry_id': -1, 'num_channels': -1}, inplace=True)
+
         # Set dtypes
         df = df.astype({'tns_id': int,
                         'name': str,

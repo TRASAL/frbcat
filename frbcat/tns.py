@@ -58,7 +58,7 @@ class TNS():
 
         self.units = {'back_end': None,
                       'barycentric_event_time': None,
-                      'burst_bandwidth': 'MHz',
+                      #'burst_bandwidth': 'MHz',
                       'burst_width': 'ms',
                       'burst_width_err': 'ms',
                       'dec_frac': 'frac. degrees',
@@ -73,13 +73,13 @@ class TNS():
                       'fluence_err': 'Jy ms',
                       'flux': 'Jy',
                       'flux_err': 'Jy',
-                      'frac_lin_pol': None,
+                      #'frac_lin_pol': None,
                       'galactic_max_dm': 'pc cm^-3',
                       'galactic_max_dm_model': None,
                       'gl_frac': 'frac. degrees',
                       'gb_frac': 'frac. degrees',
                       'group': None,
-                      'host_redshift': None,
+                      #'host_redshift': None,
                       'inst_bandwidth': 'MHz',
                       'internal_name': None,
                       'lastmodified': None,
@@ -101,7 +101,7 @@ class TNS():
                       'rm': 'rad m^-2',
                       'rm_err': 'rad m^-2',
                       'sampling_time': 'ms',
-                      'scattering_time': 'ms',
+                      #'scattering_time': 'ms',
                       'scattering_time_err': 'ms',
                       'snr': None,
                       'telescope': None,
@@ -311,9 +311,9 @@ class TNS():
                         'reports_id': int,
                         'photometry_id': int,
                         'snr': float,
-                        'num_channels': int,
-                        'host_redshift': float,
-                        'frac_lin_pol': float})
+                        'num_channels': int})
+                        #'host_redshift': float,
+                        #'frac_lin_pol': float})
 
         # Clean up columns
         df.repeater_of_objid = df.repeater_of_objid.replace(r'^\s*$', np.nan,
@@ -357,18 +357,18 @@ class TNS():
         err[err == ''] = np.nan
         df['fluence_err'] = err.astype(float)
 
-        for c in ('burst_width', 'scattering_time'):
-            cols = df[c].str.strip(' ms').str.partition(' (')[[0, 2]]
-            df[c] = cols[0].astype(float)
-            err = cols[2].str.strip(')')
-            err[err == ''] = np.nan
-            df[c + '_err'] = err.astype(float)
+        #for c in ('burst_width', 'scattering_time'):
+        #    cols = df[c].str.strip(' ms').str.partition(' (')[[0, 2]]
+        #    df[c] = cols[0].astype(float)
+        #    err = cols[2].str.strip(')')
+        #    err[err == ''] = np.nan
+        #    df[c + '_err'] = err.astype(float)
 
-        cols = df.burst_bandwidth.str.strip(' MHz').str.partition(' (')[[0, 2]]
-        df['burst_bandwidth'] = cols[0].astype(float)
-        err = cols[2].str.strip(')')
-        err[err == ''] = np.nan
-        df['burst_bandwidth_err'] = err.astype(float)
+        #cols = df.burst_bandwidth.str.strip(' MHz').str.partition(' (')[[0, 2]]
+        #df['burst_bandwidth'] = cols[0].astype(float)
+        #err = cols[2].str.strip(')')
+        #err[err == ''] = np.nan
+        #df['burst_bandwidth_err'] = err.astype(float)
 
         # Commenting out as some FAST entries seem to use GHz
         # instead of MHz units in the reference frequency field

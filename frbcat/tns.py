@@ -98,8 +98,8 @@ class TNS():
                       'repeater_of_objid': None,
                       'reporter_name': None,
                       'reports_id': None,
-                      'rm': 'rad m^-2',
-                      'rm_err': 'rad m^-2',
+                      #'rm': 'rad m^-2',
+                      #'rm_err': 'rad m^-2',
                       'sampling_time': 'ms',
                       #'scattering_time': 'ms',
                       'scattering_time_err': 'ms',
@@ -378,11 +378,11 @@ class TNS():
         s = 'sampling_time'
         df[s] = df[s].str.strip(' ms').astype(float)
 
-        cols = df.rm.str.strip(' rad/m2').str.partition(' (')[[0, 2]]
-        df['rm'] = cols[0].astype(float)
-        err = cols[2].str.strip(')')
-        err[err == ''] = np.nan
-        df['rm_err'] = err.astype(float)
+        #cols = df.rm.str.strip(' rad/m2').str.partition(' (')[[0, 2]]
+        #df['rm'] = cols[0].astype(float)
+        #err = cols[2].str.strip(')')
+        #err[err == ''] = np.nan
+        #df['rm_err'] = err.astype(float)
 
         # Convert time columns to datetime objects
         dates = ('time_received', 'barycentric_event_time', 'discovery_date',

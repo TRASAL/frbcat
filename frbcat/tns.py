@@ -167,11 +167,18 @@ class TNS():
                     print(key, val)
         return out
 
-    def get_json(self):
+    def get_json(self, page_length=50, sleep=0.5):
+        """
+        Get TNS catalogue in json file format. 
+        page_length and sleep avoid HTTP Error 429: Too Many Requests.
+        Args:
+         page_length (int): Limit of items per page that can be queried.
+         sleep (float): sleep time between queried pages.
+        """        
         entries = []
         more = True
         page = 0
-        page_length = 500
+        page_length = 50 if page_length > 50 else page_length
 
         if not self.mute:
             m = 'Attempting to retrieve FRBs from the Transient Name Server'
